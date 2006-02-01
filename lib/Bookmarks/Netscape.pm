@@ -5,7 +5,6 @@ use Bookmarks::Parser;
 use base 'Bookmarks::Parser';
 use warnings;
 use HTML::TreeBuilder;
-use Data::Dumper;
 
 my %bookmark_fields = (
   'created'       => 'add_date',
@@ -61,7 +60,6 @@ sub parse_file
     $bookmarks->delete();
     return $self;
 
-#    print Dumper($self);
 }
 
 sub _parse_item
@@ -104,7 +102,6 @@ sub _parse_item
            _parse_item($self, $subitem, $item_info{id});
        }
     }
-#    print Dumper(\%item_info);
 }
 
 sub get_header_as_string

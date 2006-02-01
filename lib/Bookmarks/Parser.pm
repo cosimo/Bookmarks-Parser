@@ -7,7 +7,8 @@ use Bookmarks::Delicious;
 use Bookmarks::A9;
 use Storable 'dclone';
 use warnings;
-use Data::Dumper;
+
+our $VERSION = '0.01';
 
 sub new
 {
@@ -87,14 +88,12 @@ sub add_bookmark
     $parent ||= 'root';
     $item->{parent} ||= $parent;  
     $self->{_nextid}++ while(defined $self->{_items}{$self->{_nextid}});
-#    print Dumper($self->{_items}{$self->{_nextid}});
     $item->{id} ||= $self->{_nextid};
     $item->{url} ||= '';
     $item->{name} ||= $item->{url};
     if(!$item->{url} && !$item->{name})
     {
         warn 'No URL or NAME for this bookmark !?';
-#        print Dumper($item);
         return undef;
     }
 
@@ -205,7 +204,6 @@ sub as_string
 
     my $output = '';
     $output .= $self->get_header_as_string();
-#    print Dumper($self);
     foreach (@{$self->{_items}{root}{children}})
     {
         $output .= $self->get_item_as_string($self->{_items}{$_});

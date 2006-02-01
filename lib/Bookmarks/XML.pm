@@ -3,7 +3,6 @@ use base 'Bookmarks::Parser';
 use strict;
 use warnings;
 use XML::Simple;
-use Data::Dumper;
 
 sub new
 {
