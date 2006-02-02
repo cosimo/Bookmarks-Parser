@@ -6,6 +6,7 @@ use Bookmarks::XML;
 use Bookmarks::Delicious;
 use Bookmarks::A9;
 use Storable 'dclone';
+use Carp qw/croak/;
 use warnings;
 
 our $VERSION = '0.01';
@@ -13,8 +14,9 @@ our $VERSION = '0.01';
 sub new
 {
     my ($class, %opts) = @_;
-    %opts = check_options(%opts);
+    %opts = _check_options(%opts);
 
+    $class = ref $class || $class;
     my $self = bless({%opts}, $class);
     $self->{_nextid} = 1;
     $self->{_title} = '';
@@ -23,7 +25,7 @@ sub new
     return $self; 
 }
 
-sub check_options
+sub _check_options
 {
     my %opts = @_;
     return %opts;
@@ -40,10 +42,10 @@ sub parse
 
     if($filename)
     {
-        die "No such file $filename" if(!-e $filename);
+        croak "No such file $filename" if(!-e $filename);
 
         my $fh;
-        open $fh, "<$filename" or die "Can't open $filename ($!)";
+        open $fh, "<$filename" or croak "Can't open $filename ($!)";
         my $firstline = <$fh>;
         close($fh);
 
@@ -51,13 +53,15 @@ sub parse
         {
             bless $self, 'Bookmarks::Opera';
             $self->new();
-            $self->parse_file($filename);
+            $self->_parse_file($filename);
         }
-        if($firstline =~ /Netscape/i)
+        elsif($firstline =~ /Netscape/i)
         {
             bless $self, 'Bookmarks::Netscape';
             $self->new();
-            $self->parse_file($filename);
+            $self->_parse_file($filename);
+        } else {
+            croak('Unable to detect bookmark format('.$firstline.')');
         }
     }
     if($url)
@@ -66,7 +70,13 @@ sub parse
         {
             bless $self, 'Bookmarks::A9';
             $self->new();
-            $self->parse_bookmarks($user, $passwd);
+            $self->_parse_bookmarks($user, $passwd);
+        }
+        elsif($url =~ /del.icio.us/)
+        {
+            bless $self, 'Bookmarks::Delicious';
+            $self->new();
+            $self->_parse_bookmarks($user, $passwd);
         }
     }
 
@@ -192,7 +202,7 @@ sub write_file
     }
 
     open my $outfile, ">$filename" or 
-        die "Can't open $filename for writing ($!)";
+        croak "Can't open $filename for writing ($!)";
     print $outfile $self->as_string();
     close $outfile;
 }
@@ -233,6 +243,7 @@ sub get_footer_as_string
 # Replace/update param?
 sub write_url
 {
+    croak "write_url not Implemented";
 }
 
 # Return a list of all root items
@@ -250,7 +261,7 @@ sub set_top_level
 {
     my ($self, @items) = @_;
 
-    if(exists $self->{_items}{root} && @{$self->{_items}{root}{children}})
+    if(exists $self->{_items}{root} && defined @{$self->{_items}{root}{children}})
     {
         warn "Root items already exist, use clear to empty or rename to rename an item!";
         return;
@@ -429,6 +440,10 @@ Parameters:
 Add a new Bookmarks::Bookmark object somewhere in the tree. If no parent object is given, the insertion is made as a top level bookmark folder/tag. If a parent object is given, the item appears under it in a tree-like fashion. The parent object needs to be of type folder.
 
 
+=head2 as_a9 (constructor)
+
+Returns a copy of this object as a Bookmarks::A9 object, which can be imported into a9.
+
 =head2 as_opera (constructor)
 
 Parameters:
@@ -500,6 +515,19 @@ Parameters:
 
 Rename an item in the collection. (Should be in Bookmarks::Bookmark).
 
+=head2 find_items
+
+Parameters
+   url
+   name
+
+Will look through the parsed bookmarks and return bookmarks that
+matches either url or name (based on a regex match)
+
+=head2 merge <bookmarks object>
+
+Takes another bookmark object, and merges it into this one.
+
 =head2 get_folder_contents (method)
 
 Parameters:
@@ -507,21 +535,29 @@ Parameters:
 
 Returns a list of items that are children of the given folder item.
 
+=head2 get_from_id <id>
+
+Returns an element based on the element id.
+
+=head2 get_path_of <elem>
+
+Returns the full path of a given element.
+
+=head2 write_url 
+
+Not yet implemented.
+
 =head1 DEPENDENCIES
 
-Modules used, version dependencies, core yes/no
+L<WWW::A9TToolbar>
 
-Bookmarks::Netscape
+L<HTML::TreeBuilder>
 
-Bookmarks::Opera
+L<Net::Delicious>
 
-Bookmarks::XML
+L<XML::Simple>
 
-Bookmarks::Delicious
-
-=head1 NOTES
-
-...
+L<Test::More>
 
 =head1 BUGS AND LIMITATIONS
 
@@ -530,6 +566,12 @@ any
 
 =head1 AUTHOR
 
-...
+Jess Robinson <castaway@desert-island.demon.co.uk>
+Marcus Ramberg <mramberg@cpan.org>
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

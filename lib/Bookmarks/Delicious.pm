@@ -17,22 +17,7 @@ my %bookmark_fields = (
   'expanded'      => undef,
                        );
 
-sub new
-{
-    my ($class, %opts) = @_;
-    %opts = check_options(%opts);
-    
-    my $self = bless({%opts}, ref($class) || $class);
-    return $self;    
-}
-
-sub check_options
-{
-    my %opts = @_;
-    return %opts;
-}
-
-sub parse_account
+sub parse_bookmarks
 {
     my ($self, $user, $password) = @_;
 

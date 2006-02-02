@@ -17,22 +17,9 @@ my %bookmark_fields = (
   'order'         => 'ordinal',
                        );
 
-sub new
-{
-    my ($class, %opts) = @_;
-    %opts = check_options(%opts);
-    
-    my $self = bless({%opts}, ref($class) || $class);
-    return $self; 
-}
 
-sub check_options
-{
-    my %opts = @_;
-    return %opts;
-}
 
-sub parse_bookmarks
+sub _parse_bookmarks
 {
     my ($self, $user, $passwd) = @_;
 
@@ -83,3 +70,28 @@ sub _parse_children
 
 
 1;
+
+=head1 NAME 
+
+Bookmarks::A9 - style bookmarks.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+This is a subclass of L<Bookmarks::Parser> for handling A9 bookmarks.
+
+=head1 METHODS
+
+No public methods
+
+=head1 AUTHOR
+
+Jess Robinson <castaway@desert-island.demon.co.uk>
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

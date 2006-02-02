@@ -21,22 +21,8 @@ my %bookmark_fields = (
   'panel'         => 'web_panel',
                        );
 
-sub new
-{
-    my ($class, %opts) = @_;
-    %opts = check_options(%opts);
 
-    my $self = bless({%opts}, ref($class) || $class);
-    return $self; 
-}
-
-sub check_options
-{
-    my %opts = @_;
-    return %opts;
-}
-
-sub parse_file
+sub _parse_file
 {
     my ($self, $filename) = @_;
 
@@ -45,7 +31,6 @@ sub parse_file
     my $bookmarks = HTML::TreeBuilder->new();
     $bookmarks->parse_file($filename);
 
-#    $bookmarks->dump();    
 
     my $title = $bookmarks->look_down(_tag => 'title')->as_text();
     $self->set_title($title);
@@ -93,8 +78,6 @@ sub _parse_item
 
     if($item_info{type} eq 'folder')
     {
-#        $item->dump;
-#        $item->right->dump;
        my @subitems = map { $_->tag() eq 'dt' ? ($_->content_list)[0] : () } 
           $item->right->content_list();
        foreach my $subitem (@subitems)
@@ -177,4 +160,39 @@ HTML
 
    return $footer;
 }
+
 1;
+
+
+__END__
+
+=head1 NAME 
+
+Bookmarks::Netscape - Netscape style bookmarks.
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+A subclass of L<Bookmarks::Parser> for handling Mozilla bookmarks.
+
+=head1 METHODS
+
+=head2 get_header_as_string
+
+=head2 get_item_as_string
+
+=head2 get_footer_as_string
+
+See L<Bookmarks::Parser> for these methods.
+
+=head1 AUTHOR
+
+Jess Robinson <castaway@desert-island.demon.co.uk>
+
+=head1 LICENSE
+
+This library is free software, you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
