@@ -1,7 +1,12 @@
 #!/usr/bin/perl
 
 use lib 'lib';
-use Test::More 'no_plan';
+use Test::More;
+if ($ENV{A9_USER} && A9_PASS) {
+   plan tests => 12;
+} else {
+    plan skip_all => 'This test requires login. set A9_USER and A9_PASS to enable this test' ;
+}
 use Data::Dumper;
 
 # 1 test load of base class
@@ -14,9 +19,9 @@ isa_ok($parser, 'Bookmarks::Parser');
 can_ok('Bookmarks::Parser', 'parse');
 
 # 4 parse netscape style file
-$parser->parse({user => 'castaway@desert-island.demon.co.uk',
+$parser->parse({user => $ENV{A9_USER},
                 url => 'a9.com',
-                passwd => 'FOO'});
+                passwd => $ENV{A9_PASS}});
 isa_ok($parser, 'Bookmarks::A9');
 
 # print Dumper($parser);
