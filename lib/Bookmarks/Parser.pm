@@ -392,19 +392,32 @@ This documentation refers to version 0.01.
 
 =head1 SYNOPSIS
 
-use Bookmarks::Parser;
-my $parser = Bookmarks::Parser->new();
-my $bookmarks = $parser->parse({filename => 'bookmarks.html'});
-my @rootitems = $bookmarks->get_top_level();
+  use Bookmarks::Parser;
+  my $parser = Bookmarks::Parser->new();
+  my $bookmarks = $parser->parse({filename => 'bookmarks.html'});
+  my @rootitems = $bookmarks->get_top_level();
 
 =head1 DESCRIPTION
 
 The Bookmarks::Parser class implements a collection of bookmarks. Supported representations currently include:
-Netscape/Mozilla
-Opera
-Delicious
 
-The various types of collections are automatically recognised. Each is parsed into a tree like structure which can then be accessed in parts or re-written as any of the supported bookmark collection types. Two types of bookmark item are distinguished, folder objects can contain other items, url objects cannot. For bookmark collections with tagging instead of folders, the tags are stored as folders. Each unique URL is stored exactly once, but can appear under many folder items.
+=over 4
+
+=item Netscape/Mozilla
+
+=item Opera
+
+=item A9
+
+=item Delicious
+
+The various types of collections are automatically recognised. Each is parsed
+into a tree like structure which can then be accessed in parts or re-written
+as any of the supported bookmark collection types. Two types of bookmark item 
+are distinguished, folder objects can contain other items, url objects
+cannot. For bookmark collections with tagging instead of folders, the tags 
+are stored as folders. Each unique URL is stored exactly once, but can appear 
+under many folder items. 
 
 =head1 SUBROUTINES/METHODS
 
@@ -420,16 +433,20 @@ Create a new parser object, no parameters as yet.
 Parameters:
     hashref of named arguments: filename, url, user, passwd
 
-Parse a collection of bookmarks. This can be passed a filename of a bookmarks file on a local disk, or a url and user/passwd combination of a bookmarks collection stored on a remote server.
+Parse a collection of bookmarks. This can be passed a filename of a bookmarks 
+file on a local disk, or a url and user/passwd combination of a bookmarks 
+collection stored on a remote server.
 
-Currently, best guesses are made as to which type of bookmarks collection is being parsed, Opera, Netscape/Mozilla and Delicious are supported so far.
+Currently, best guesses are made as to which type of bookmarks collection is 
+being parsed, Opera, Netscape/Mozilla and Delicious are supported so far.
 
 =head2 set_title (method)
 
 Parameters:
     title - String
 
-Some bookmarks collections (Netscape) have an overall title for the collection, this method can be used to set/change the title.
+Some bookmarks collections (Netscape) have an overall title for the
+collection, this method can be used to set/change the title.
 
 =head2 add_bookmark (method)
 
@@ -437,61 +454,74 @@ Parameters:
     bookmark - Bookmarks::Bookmark
     parent   - Bookmarks::Bookmark
 
-Add a new Bookmarks::Bookmark object somewhere in the tree. If no parent object is given, the insertion is made as a top level bookmark folder/tag. If a parent object is given, the item appears under it in a tree-like fashion. The parent object needs to be of type folder.
-
+Add a new Bookmarks::Bookmark object somewhere in the tree. If no parent
+object is given, the insertion is made as a top level bookmark folder/tag. 
+If a parent object is given, the item appears under it in a tree-like
+fashion. The parent object needs to be of type folder.
 
 =head2 as_a9 (constructor)
 
-Returns a copy of this object as a Bookmarks::A9 object, which can be imported into a9.
+Returns a copy of this object as a Bookmarks::A9 object, which can be imported 
+into a9.
 
 =head2 as_opera (constructor)
 
 Parameters:
     none
 
-Returns a copy of this object as a Bookmarks::Opera object, which can be written out as an Opera bookmarks file.
+Returns a copy of this object as a Bookmarks::Opera object, which can be
+written out as an Opera bookmarks file.
 
 =head2 as_netscape (constructor)
 
 Parameters:
     none
 
-Returns a copy of this object, as a Bookmarks::Netscape object, which can be written out as an Opera bookmarks file.
+Returns a copy of this object, as a Bookmarks::Netscape object, which can 
+be written out as an Opera bookmarks file.
 
 =head2 as_xml (constructor)
 
 Parameters:
     none
 
-Returns a copy of this object, as a Bookmarks::XML object, which can be saved as an XML file.
+Returns a copy of this object, as a Bookmarks::XML object, which can be saved 
+as an XML file.
 
 =head2 write_file (method)
 
 Parameters:
     a hashref of named arguments: filename, type
 
-Create a file containing the bookmarks collection to disk. The default type will be the same as the parsed in file, or the type converted to last by one of the as_ functions. Types that can be given are: opera, netscape and delicious.
+Create a file containing the bookmarks collection to disk. The default type
+will be the same as the parsed in file, or the type converted to last by one 
+of the as_ functions. Types that can be given are: opera, netscape and delicious.
 
 =head2 as_string (method)
 
 Parameters:
     type (optional)  - String
 
-Return the contents of the bookmarks collection as a string. This is just the same content as will be written to the file by the write_file method.
+Return the contents of the bookmarks collection as a string. This is just the
+ same content as will be written to the file by the write_file method.
 
 =head2 get_header_as_string (method)
 
 Parameters:
     type (optional)  - String
 
-Called by as_string to get a header for the bookmarks collection. This is defined as all the text that appears in the bookmarks file before the actual bookmarks.
+Called by as_string to get a header for the bookmarks collection. This is 
+defined as all the text that appears in the bookmarks file before the actual 
+bookmarks.
 
 =head2 get_footer_as_string (method)
 
 Parameters:
     type (optional)  - String
 
-Called by as_string to get a footer for the bookmarks collection. This is defined as all the text that appears in the bookmarks file after the actual bookmarks.
+Called by as_string to get a footer for the bookmarks collection. This is 
+defined as all the text that appears in the bookmarks file after the actual
+bookmarks. 
 
 =head2 get_top_level (method)
 
@@ -562,7 +592,7 @@ L<Test::More>
 =head1 BUGS AND LIMITATIONS
 
 None known currently, please email the author if you find
-any
+any.
 
 =head1 AUTHOR
 
