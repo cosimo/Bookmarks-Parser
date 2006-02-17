@@ -35,12 +35,20 @@ sub parse
 {
     my ($self, $args) = @_;
 
+    croak "Parse can't be called as a class method" unless ref $self;
+    croak "Arguments must be a hashref" unless ref $args;
+
     my ($filename, $url, $user, $passwd) = @$args{'filename', 
                                                  'url', 
                                                  'user', 
                                                  'passwd'};
 
-    if($filename)
+    if($filename =~ m/\.zip$/) {
+            bless $self, 'Bookmarks::Explorer';
+            $self->new();
+            $self->_parse_file($filename);
+    }
+    elsif($filename)
     {
         croak "No such file $filename" if(!-e $filename);
 
@@ -64,7 +72,7 @@ sub parse
             croak('Unable to detect bookmark format('.$firstline.')');
         }
     }
-    if($url)
+    elsif($url)
     {
         if($url =~ /a9.com/)
         {
@@ -78,6 +86,8 @@ sub parse
             $self->new();
             $self->_parse_bookmarks($user, $passwd);
         }
+    } else {
+        croak "Nothing to parse!";
     }
 
     return $self;
@@ -392,10 +402,10 @@ This documentation refers to version 0.01.
 
 =head1 SYNOPSIS
 
-  use Bookmarks::Parser;
-  my $parser = Bookmarks::Parser->new();
-  my $bookmarks = $parser->parse({filename => 'bookmarks.html'});
-  my @rootitems = $bookmarks->get_top_level();
+    use Bookmarks::Parser;
+    my $parser = Bookmarks::Parser->new();
+    my $bookmarks = $parser->parse({filename => 'bookmarks.html'});
+    my @rootitems = $bookmarks->get_top_level();
 
 =head1 DESCRIPTION
 

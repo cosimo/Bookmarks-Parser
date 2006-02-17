@@ -99,3 +99,14 @@ XML
 }
 
 1;
+
+=head1 NAME
+
+Bookmarks::Parser::XML - Backend for XML format
+
+=head1 DESCRIPTION
+
+This backend is completely untested, and probably does not work yet. use at own risk.
+It will probably be replaced with an XBEL based backend in a future release.
+
+=cut

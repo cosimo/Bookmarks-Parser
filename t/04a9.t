@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::More;
 if ($ENV{A9_USER} && A9_PASS) {
-   plan tests => 12;
+   plan tests => 6;
 } else {
     plan skip_all => 'This test requires login. set A9_USER and A9_PASS to enable this test' ;
 }

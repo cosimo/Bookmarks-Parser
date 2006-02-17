@@ -3,7 +3,7 @@
 use lib 'lib';
 use Test::More;
 if ($ENV{DELUSER} && $ENV{DELPASS}) {
-   plan skip_all => 'Not implemented yet.';
+   plan tests => 6;
 } else {
     plan skip_all => 'This test requires login. set DELUSER and DELPASSWD to enable this test' ;
 }
@@ -18,15 +18,15 @@ isa_ok($parser, 'Bookmarks::Parser');
 can_ok('Bookmarks::Parser', 'parse');
 
 # 4 parse netscape style file
-$parser->parse({user => $ENV{A9_USER},
-                url => 'a9.com',
-                passwd => $ENV{A9_PASS}});
-isa_ok($parser, 'Bookmarks::A9');
+$parser->parse({user => $ENV{DELUSER},
+                url => 'del.icio.us',
+                passwd => $ENV{DELPASS}});
+isa_ok($parser, 'Bookmarks::Delicious');
 
 # 5 check root items exist
 my @roots = $parser->get_top_level();
 
-# is($roots[0]->{name}, 'Personal Toolbar Folder', 'Found root item');
+#is($roots[0]->{name}, 'Personal Toolbar Folder', 'Found root item');
 
 # # 6,7 check we parsed all subitems
 # my @subitems = $parser->get_folder_contents($roots[0]);

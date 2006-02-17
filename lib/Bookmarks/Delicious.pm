@@ -17,7 +17,7 @@ my %bookmark_fields = (
   'expanded'      => undef,
                        );
 
-sub parse_bookmarks
+sub _parse_bookmarks
 {
     my ($self, $user, $password) = @_;
 
@@ -47,3 +47,13 @@ sub parse_bookmarks
         }
     }
 }
+
+=head1 NAME
+
+Bookmarks::Parser::Delicious - Backend for delicious bookmarks
+
+=head1 DESCRIPTION
+
+This backend is completely untested, and probably does not work yet. use at own risk.
+
+=cut

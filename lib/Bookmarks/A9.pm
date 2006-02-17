@@ -15,7 +15,7 @@ my %bookmark_fields = (
   'expanded'      => undef,
   'trash'         => undef,
   'order'         => 'ordinal',
-                       );
+);
 
 
 
