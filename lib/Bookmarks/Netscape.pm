@@ -5,6 +5,7 @@ use Bookmarks::Parser;
 use base 'Bookmarks::Parser';
 use warnings;
 use HTML::TreeBuilder;
+use 5.008;
 
 my %bookmark_fields = (
   'created'       => 'add_date',
@@ -96,6 +97,7 @@ sub get_header_as_string
 <!-- This is an automatically generated file.
 It will be read and overwritten.
 Do Not Edit! -->
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
 <TITLE>$self->{_title}</TITLE>
 <H1>$self->{_title}</H1>
 

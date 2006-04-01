@@ -213,6 +213,7 @@ sub write_file
 
     open my $outfile, ">$filename" or 
         croak "Can't open $filename for writing ($!)";
+    binmode($outfile, ':utf8');
     print $outfile $self->as_string();
     close $outfile;
 }
