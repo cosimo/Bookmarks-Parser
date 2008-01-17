@@ -18,7 +18,7 @@ isa_ok($parser, 'Bookmarks::Parser');
 # 3 check parse function
 can_ok('Bookmarks::Parser', 'parse');
 
-# 4 parse netscape style file
+# 4 parse A9 service bookmarks
 $parser->parse({user => $ENV{A9_USER},
                 url => 'a9.com',
                 passwd => $ENV{A9_PASS}});
