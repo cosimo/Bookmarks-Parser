@@ -46,61 +46,82 @@ my $netscapefile = $netscape->as_string();
 
 my $xmlparser = $parser->as_xml();
 isa_ok($xmlparser, 'Bookmarks::XML');
+
 my $xmlfile = $xmlparser->as_string();
 # print $xmlfile;
+ok($xmlfile);
 
 # ----------------------------------------------------
 # Open the new Opera 11.50 default bookmarks file
 #
 
-$parser = Bookmarks::Parser->new();
-my $parsed = $parser->parse({filename => 't/opera-1150.adr'});
-ok($parsed, "opera-1150.adr has been loaded");
+# And check that we can do any of this both for DOS and Unix files
+for ("t/opera-1150.adr", "t/opera-1150-unix.adr")
+{
 
-isa_ok(
-    $parser =>, 'Bookmarks::Opera',
-    'Reblessed parser as Bookmarks::Opera'
-);
+    my $adr_file = $_;
 
-@roots = $parser->get_top_level();
+    $parser = Bookmarks::Parser->new();
+    my $parsed = $parser->parse({filename => $adr_file});
+    ok($parsed, "'$adr_file' has been loaded");
 
-my $trash = $roots[0];
-my $opera = $roots[1];
+    isa_ok(
+        $parser =>, 'Bookmarks::Opera',
+        'Reblessed parser as Bookmarks::Opera'
+    );
 
-is(scalar(@roots) => 2, "Root folder should contain 2 items");
-is($trash->{name}, "Trash", "first item is the trash folder");
-is($trash->{type}, "folder", "Trash is a folder");
-is($trash->{uniqueid}, "14C645A5B8A3470FB3B52CC32C97E2B8");
+    @roots = $parser->get_top_level();
 
-is($opera->{name}, "Opera", "second item is the Opera folder");
-is($opera->{type}, "folder", "Opera is a folder");
-is($opera->{uniqueid}, "CFF0FB2AB8F0403BB524F77EF43A30E3", "Opera uniqueid is extracted correctly");
+    my $trash = $roots[0];
+    my $opera = $roots[1];
 
-@subitems = $parser->get_folder_contents($opera);
-my $download = $subitems[0];
-my $myomail = $subitems[-1];
+    is(scalar(@roots) => 2, "Root folder should contain 2 items");
+    is($trash->{name}, "Trash", "first item is the trash folder");
+    is($trash->{type}, "folder", "Trash is a folder");
+    is($trash->{uniqueid}, "14C645A5B8A3470FB3B52CC32C97E2B8");
 
-#diag("download=".Dumper($download));
-#diag("myoperamail=".Dumper($myomail));
+    is($opera->{name}, "Opera", "second item is the Opera folder");
+    is($opera->{type}, "folder", "Opera is a folder");
+    is($opera->{uniqueid}, "CFF0FB2AB8F0403BB524F77EF43A30E3", "Opera uniqueid is extracted correctly");
 
-is($download->{type}, 'url', 'Bookmark type must be "url"');
-is($download->{id}, 14, 'Check that we got the correct one for real');
-is(
-    $download->{uniqueid} => '1E1142BB54F648238B9236643A3183C0',
-    'Download Opera uniqueid extracted correctly'
-);
-is(
-    $download->{url} => 'http://www.opera.com/download/?utm_source=DesktopBrowser&utm_medium=Bookmark&utm_campaign=BrowserLinks',
-    "First bookmark points to Opera.com/download"
-);
-is(
-    $myomail->{name} => 'My Opera Mail',
-    "Last root bookmark is Mail"
-);
-is(
-    $myomail->{partnerid} => "opera-mail2",
-    "Partnerid is also extracted"
-);
+    @subitems = $parser->get_folder_contents($opera);
+    is(
+        scalar(@subitems) => 19,
+        "Check that last bookmark is included in the parsed list"
+    );
+
+    my $download = $subitems[0];
+    my $sports = $subitems[-1];
+    my $myomail = $subitems[-2];
+
+    #iag("download=".Dumper($download));
+    #iag("myoperamail=".Dumper($myomail));
+
+    is(
+        $sports->{name}, "Sports",
+        "Check that we can load the last bookmark correctly"
+    );
+
+    is($download->{type}, 'url', 'Bookmark type must be "url"');
+    is($download->{id}, 14, 'Check that we got the correct one for real');
+    is(
+        $download->{uniqueid} => '1E1142BB54F648238B9236643A3183C0',
+        'Download Opera uniqueid extracted correctly'
+    );
+    is(
+        $download->{url} => 'http://www.opera.com/download/?utm_source=DesktopBrowser&utm_medium=Bookmark&utm_campaign=BrowserLinks',
+        "First bookmark points to Opera.com/download"
+    );
+    is(
+        $myomail->{name} => 'My Opera Mail',
+        "Last root bookmark is Mail"
+    );
+    is(
+        $myomail->{partnerid} => "opera-mail2",
+        "Partnerid is also extracted"
+    );
+
+}  # DOS and Unix line endings
 
 #
 # End of test
