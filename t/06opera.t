@@ -12,7 +12,7 @@ isa_ok($parser, 'Bookmarks::Opera');
 
 # 3 check root items exist
 my @roots = $parser->get_top_level();
-is_deeply([ map { $_->{name} } @roots ], 
+is_deeply([ map { $_->{name} } @roots ],
             ['Trash', 'Opera', 'Download.com', 'Amazon.com', 'Dealtime.com', 'eBay'], 'Found root items');
 
 # 4,5 check we parsed subitems
@@ -29,7 +29,7 @@ $opera->set_top_level('root folder');
 is($roots[0]->{name}, 'root folder', 'Set root items');
 
 # 8 rename the root folder
-is($opera->rename($roots[0], 'new root folder'), 
+is($opera->rename($roots[0], 'new root folder'),
    'new root folder', 'Renamed root item');
 
 # 9 set title
@@ -48,3 +48,59 @@ my $xmlparser = $parser->as_xml();
 isa_ok($xmlparser, 'Bookmarks::XML');
 my $xmlfile = $xmlparser->as_string();
 # print $xmlfile;
+
+# ----------------------------------------------------
+# Open the new Opera 11.50 default bookmarks file
+#
+
+$parser = Bookmarks::Parser->new();
+my $parsed = $parser->parse({filename => 't/opera-1150.adr'});
+ok($parsed, "opera-1150.adr has been loaded");
+
+isa_ok(
+    $parser =>, 'Bookmarks::Opera',
+    'Reblessed parser as Bookmarks::Opera'
+);
+
+@roots = $parser->get_top_level();
+
+my $trash = $roots[0];
+my $opera = $roots[1];
+
+is(scalar(@roots) => 2, "Root folder should contain 2 items");
+is($trash->{name}, "Trash", "first item is the trash folder");
+is($trash->{type}, "folder", "Trash is a folder");
+is($trash->{uniqueid}, "14C645A5B8A3470FB3B52CC32C97E2B8");
+
+is($opera->{name}, "Opera", "second item is the Opera folder");
+is($opera->{type}, "folder", "Opera is a folder");
+is($opera->{uniqueid}, "CFF0FB2AB8F0403BB524F77EF43A30E3", "Opera uniqueid is extracted correctly");
+
+@subitems = $parser->get_folder_contents($opera);
+my $download = $subitems[0];
+my $myomail = $subitems[-1];
+
+#diag("download=".Dumper($download));
+#diag("myoperamail=".Dumper($myomail));
+
+is($download->{type}, 'url', 'Bookmark type must be "url"');
+is($download->{id}, 14, 'Check that we got the correct one for real');
+is(
+    $download->{uniqueid} => '1E1142BB54F648238B9236643A3183C0',
+    'Download Opera uniqueid extracted correctly'
+);
+is(
+    $download->{url} => 'http://www.opera.com/download/?utm_source=DesktopBrowser&utm_medium=Bookmark&utm_campaign=BrowserLinks',
+    "First bookmark points to Opera.com/download"
+);
+is(
+    $myomail->{name} => 'My Opera Mail',
+    "Last root bookmark is Mail"
+);
+is(
+    $myomail->{partnerid} => "opera-mail2",
+    "Partnerid is also extracted"
+);
+
+#
+# End of test
