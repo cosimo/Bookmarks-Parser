@@ -9,7 +9,7 @@ use Storable 'dclone';
 use Carp qw/croak/;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new
 {
@@ -424,11 +424,13 @@ The Bookmarks::Parser class implements a collection of bookmarks. Supported repr
 
 The various types of collections are automatically recognised. Each is parsed
 into a tree like structure which can then be accessed in parts or re-written
-as any of the supported bookmark collection types. Two types of bookmark item 
+as any of the supported bookmark collection types. Two types of bookmark item
 are distinguished, folder objects can contain other items, url objects
-cannot. For bookmark collections with tagging instead of folders, the tags 
-are stored as folders. Each unique URL is stored exactly once, but can appear 
-under many folder items. 
+cannot. For bookmark collections with tagging instead of folders, the tags
+are stored as folders. Each unique URL is stored exactly once, but can appear
+under many folder items.
+
+=back
 
 =head1 SUBROUTINES/METHODS
 
@@ -444,11 +446,11 @@ Create a new parser object, no parameters as yet.
 Parameters:
     hashref of named arguments: filename, url, user, passwd
 
-Parse a collection of bookmarks. This can be passed a filename of a bookmarks 
-file on a local disk, or a url and user/passwd combination of a bookmarks 
+Parse a collection of bookmarks. This can be passed a filename of a bookmarks
+file on a local disk, or a url and user/passwd combination of a bookmarks
 collection stored on a remote server.
 
-Currently, best guesses are made as to which type of bookmarks collection is 
+Currently, best guesses are made as to which type of bookmarks collection is
 being parsed, Opera, Netscape/Mozilla and Delicious are supported so far.
 
 =head2 set_title (method)
@@ -610,6 +612,8 @@ any.
 Jess Robinson <castaway@desert-island.demon.co.uk>
 
 Marcus Ramberg <mramberg@cpan.org>
+
+Cosimo Streppone <cosimo@cpan.org>
 
 =head1 LICENSE
 

@@ -1,26 +1,35 @@
-#!/usr/bin/perl
+# Opera-specific bookmarks parser and producer
 
 package Bookmarks::Opera;
-# use Bookmarks::Parser;
-use base 'Bookmarks::Parser';
+
+use strict;
 use warnings;
+use base 'Bookmarks::Parser';
 
-my %bookmark_fields = (
-  'created'       => 'created',
-  'modified'      => undef,
-  'visited'       => 'visited',
-  'charset'       => undef,
-  'url'           => 'url',
-  'name'          => 'name',
-  'id'            => 'id',
-  'personal'      => undef,
-  'icon'          => 'iconfile',
-  'description'   => 'description',
-  'expanded'      => 'expanded',
-  'trash'         => 'trash folder',
-  'order'         => 'order',
-                       );
+# Last updated, September 2011,
+# Opera Hotlist version 21
+my @op_bookmark_fields = (
+    "ACTIVE",
+    "CREATED",
+    "DELETABLE",
+    "DESCRIPTION",
+    "DISPLAY URL",
+    "ID",
+    "MOVE_IS_COPY",
+    "NAME",
+    "ON PERSONALBAR",
+    "PARTNERID",
+    "PERSONALBAR_POS",
+    "SEPARATOR_ALLOWED",
+    "SHORT NAME",
+    "TARGET",
+    "TRASH FOLDER",
+    "UNIQUEID",
+    "URL",
+    "VISITED",
+);
 
+my %op_bookmark_fields = map { $_ => qr/\s+$_=(.*)/ } @op_bookmark_fields;
 
 sub _parse_file
 {
@@ -40,21 +49,13 @@ sub _parse_file
         next if($line =~ /^Opera Hotlist version/);
         next if($line =~ /^Options:/);
 
-        if($line eq '')
+        if ($line =~ m{^ \s* $}x)
         {
             if($curitem->{start})
             {
-#                print Dumper($curitem);
                 delete $curitem->{start};
                 $curitem->{parent} = $curfolder->{id};
-#                $curitem->{parent} = exists $curfolder->{id} 
-#                                      ? $curfolder->{id} : 'root';
-#                push @{$self->{_itemlist}}, $curitem->{id};
-#                push @{$self->{_items}{$curitem->{parent}}{children}}, $curitem->{id};
-#                $self->{_items}{$curitem->{id}} = $curitem;
-
                 $self->add_bookmark($curitem, $curfolder->{id});
-                
                 if($curitem->{type} eq 'folder')
                 {
                     $curfolder = $curitem;
@@ -75,18 +76,29 @@ sub _parse_file
         }
         if($curitem->{start})
         {
-            $curitem->{ name       } = $1 if($line =~ /\s+NAME=(.*)/       );
-            $curitem->{ id         } = $1 if($line =~ /\s+ID=(\d+)/        );
-            $curitem->{ created    } = $1 if($line =~ /\s+CREATED=(\d+)/   );
-            $curitem->{ url        } = $1 if($line =~ /\s+URL=(.*)/        );
-            $curitem->{ visited    } = $1 if($line =~ /\s+VISITED=(\d+)/   );
-            $curitem->{ icon       } = $1 if($line =~ /\s+ICONFILE=(.*)/   );
-            $curitem->{ description} = $1 if($line =~ /\s+DESCRIPTION=(.*)/);
-            $curitem->{ order      } = $1 if($line =~ /\s+ORDER=(\d+)/     );
-            $curitem->{ expanded   } = $1 if($line =~ /\s+EXPANDED=(.*)/   );
+            for my $key (keys %op_bookmark_fields) {
+                my $re = $op_bookmark_fields{$key};
+                if ($line =~ $re) {
+                    my $value = $1;
+                    my $nicename = lc $key;
+                    $nicename =~ s{\s}{_}g;
+                    $nicename =~ s{iconfile}{icon};
+                    $curitem->{$nicename} = $value;
+                }
+            }
         }
     }
-        
+
+    # Deal with last element if there's no closing empty line
+    if ($curitem->{start})
+    {
+        delete $curitem->{start};
+        $curitem->{parent} = $curfolder->{id};
+        $self->add_bookmark($curitem, $curfolder->{id});
+        $curfolder = $curitem if $curitem->{type} eq 'folder';
+        $curitem = {};
+    }
+
     close($fh);
     return $self;
 }
@@ -97,7 +109,7 @@ sub get_header_as_string
 
     my $header = << "HEADER";
 Opera Hotlist version 2.0
-Options: encoding = utf8, version=3
+Options: encoding = utf8, version=21
 
 HEADER
 
@@ -110,13 +122,13 @@ HEADER
     sub get_item_as_string
     {
         my ($self, $item) = @_;
-        
+
         if(!defined $item->{id} || !$self->{_items}{$item->{id}})
         {
             warn "No such item in get_item_as_string";
             return;
         }
-        
+
         my $string = '';
         my ($id, $url, $name, $visited, $created, $modified, $icon, $desc, $expand, $trash, $order) =
             ($item->{id} || 0,
@@ -130,7 +142,7 @@ HEADER
              $item->{expanded} || '',
              $item->{trash} || '',
              $item->{order} || undef);
-        
+
         if($item->{type} eq 'folder')
         {
             if(!defined($order))
@@ -148,18 +160,18 @@ HEADER
             $string .= "        ICONFILE=$icon\n"      if($icon);
             $string .= "        ORDER=$order\n"        if(defined $order);
             $string .= "\n";
-            
+
             $string .= $self->get_item_as_string($self->{_items}{$_})
                 foreach (@{$item->{children}});
             $string .= "-\n";
-        } 
+        }
         elsif($item->{type} eq 'url')
         {
             if(!defined($order))
             {
                 $order = $folorder++;
             }
-                
+
             $string .= "#URL\n";
             $string .= "        ID=$id\n";
             $string .= "        NAME=$name\n";
@@ -173,7 +185,7 @@ HEADER
             $string .= "        ORDER=$order\n"        if(defined $order);
             $string .= "\n";
         }
-        
+
         return $string;
     }
 }
@@ -182,11 +194,36 @@ HEADER
 
 __END__
 
-=head1 NAME 
+=head1 NAME
 
 Bookmarks::Opera - Opera style bookmarks.
 
 =head1 SYNOPSIS
+
+    use Data::Dumper;
+    use Bookmarks::Parser;
+
+    # You don't need to explicitly use Bookmarks::Opera
+    my $parser = Bookmarks::Parser->new();
+
+    # Existing Opera bookmark file
+    my $file = "bookmarks.adr";
+
+    my $bookmarks = $parser->parse({filename => $file});
+    my @nodes = $bookmarks->get_top_level();
+    my @tree;
+
+    # Depth-first bookmarks tree visit
+    while (@nodes) {
+        my $node = shift @nodes;
+        push @tree, $node;
+        if ($node->{children}) {
+            push @nodes, $bookmarks->get_from_id($_)
+                for @{ $node->{children} };
+        }
+    }
+
+    print Dumper(\@tree);
 
 =head1 DESCRIPTION
 
@@ -194,11 +231,11 @@ A subclass of L<Bookmarks::Parser> for handling Opera bookmarks.
 
 =head1 METHODS
 
-=head2 get_header_as_string
+=head2 C<get_header_as_string>
 
-=head2 get_item_as_string
+=head2 C<get_item_as_string>
 
-=head2 get_footer_as_string
+=head2 C<get_footer_as_string>
 
 See L<Bookmarks::Parser> for these methods.
 
@@ -206,9 +243,12 @@ See L<Bookmarks::Parser> for these methods.
 
 Jess Robinson <castaway@desert-island.demon.co.uk>
 
+Cosimo Streppone <cosimo@cpan.org>
+
 =head1 LICENSE
 
 This library is free software, you can redistribute it and/or modify it under
 the same terms as Perl itself.
 
 =cut
+

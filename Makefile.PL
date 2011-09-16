@@ -5,7 +5,7 @@ use 5.008;
 
 WriteMakefile(
     NAME                => 'Bookmarks::Parser',
-    AUTHOR              => 'Marcus Ramberg <marcus@thefeed.no>',
+    AUTHOR              => 'Marcus Ramberg <mramberg@cpan.org>',
     VERSION_FROM        => 'lib/Bookmarks/Parser.pm',
     ABSTRACT_FROM       => 'lib/Bookmarks/Parser.pm',
     PL_FILES            => {},

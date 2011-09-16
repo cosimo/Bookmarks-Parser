@@ -1,5 +1,13 @@
 Revision history for Bookmarks::Parser
 
-0.01    
+0.02
+        [Bookmarks::Opera] Fixed two fairly bad bugs:
+          * items separated by lines containing leading spaces (instead of empty)
+            were not parsed correctly, skipping to the next bookmark
+          * last item wouldn't be parsed if there wasn't an empty last line
+
+        [Bookmarks::Opera] Updated to handle all Opera custom properties.
+
+0.01
         First version, released on an unsuspecting world.
 
