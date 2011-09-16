@@ -1,0 +1,23 @@
+Changes
+examples/stuffurls.pl
+lib/Bookmarks/A9.pm
+lib/Bookmarks/Bookmark.pm
+lib/Bookmarks/Delicious.pm
+lib/Bookmarks/Netscape.pm
+lib/Bookmarks/Opera.pm
+lib/Bookmarks/Parser.pm
+lib/Bookmarks/XML.pm
+Makefile.PL
+MANIFEST			This list of files
+t/01general.t
+t/03podcoverage.t
+t/04a9.t
+t/05netscape.t
+t/05pod.t
+t/06opera.t
+t/07delicious.t
+t/bookmarks.html
+t/mozbookmarks.html
+t/opera-1150-unix.adr
+t/opera-1150.adr
+t/opera6.adr
