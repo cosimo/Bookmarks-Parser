@@ -109,4 +109,20 @@ Bookmarks::Parser::XML - Backend for XML format
 This backend is completely untested, and probably does not work yet. use at own risk.
 It will probably be replaced with an XBEL based backend in a future release.
 
+=head1 METHODS
+
+=head2 get_footer_as_string
+
+=head2 get_header_as_string
+
+=head2 get_item_as_string
+
+=head2 new
+
+=head2 parse_file
+
+For these methods, consult L<Bookmarks::Parser> documentation.
+They are overridden because of the XML behaviour here.
+Interface remains the same.
+
 =cut
