@@ -1,5 +1,5 @@
-
 package Bookmarks::Parser;
+
 use Bookmarks::Netscape;
 use Bookmarks::Opera;
 use Bookmarks::XML;
@@ -11,116 +11,102 @@ use warnings;
 
 our $VERSION = '0.03';
 
-sub new
-{
+sub new {
     my ($class, %opts) = @_;
     %opts = _check_options(%opts);
 
     $class = ref $class || $class;
     my $self = bless({%opts}, $class);
-    $self->{_nextid} = 1;
-    $self->{_title} = '';
-    $self->{_items} = {root => {name => 'root', url => ''}};
+    $self->{_nextid}   = 1;
+    $self->{_title}    = '';
+    $self->{_items}    = {root => {name => 'root', url => ''}};
     $self->{_itemlist} = [];
-    return $self; 
+    return $self;
 }
 
-sub _check_options
-{
+sub _check_options {
     my %opts = @_;
     return %opts;
 }
 
-sub parse
-{
+sub parse {
     my ($self, $args) = @_;
 
     croak "Parse can't be called as a class method" unless ref $self;
-    croak "Arguments must be a hashref" unless ref $args;
+    croak "Arguments must be a hashref"             unless ref $args;
 
-    my ($filename, $url, $user, $passwd) = @$args{'filename', 
-                                                 'url', 
-                                                 'user', 
-                                                 'passwd'};
+    my ($filename, $url, $user, $passwd) = @$args{'filename', 'url', 'user', 'passwd'};
 
-    if($filename =~ m/\.zip$/) {
-            bless $self, 'Bookmarks::Explorer';
-            $self->new();
-            $self->_parse_file($filename);
+    if ($filename =~ m/\.zip$/) {
+        bless $self, 'Bookmarks::Explorer';
+        $self->new();
+        $self->_parse_file($filename);
     }
-    elsif($filename)
-    {
-        croak "No such file $filename" if(!-e $filename);
+    elsif ($filename) {
+        croak "No such file $filename" if (!-e $filename);
 
         my $fh;
         open $fh, "<$filename" or croak "Can't open $filename ($!)";
         my $firstline = <$fh>;
         close($fh);
 
-        if($firstline =~ /Opera/)
-        {
+        if ($firstline =~ /Opera/) {
             bless $self, 'Bookmarks::Opera';
             $self->new();
             $self->_parse_file($filename);
         }
-        elsif($firstline =~ /Netscape/i)
-        {
+        elsif ($firstline =~ /Netscape/i) {
             bless $self, 'Bookmarks::Netscape';
             $self->new();
             $self->_parse_file($filename);
-        } else {
-            croak('Unable to detect bookmark format('.$firstline.')');
+        }
+        else {
+            croak('Unable to detect bookmark format(' . $firstline . ')');
         }
     }
-    elsif($url)
-    {
-        if($url =~ /a9.com/)
-        {
+    elsif ($url) {
+        if ($url =~ /a9.com/) {
             bless $self, 'Bookmarks::A9';
             $self->new();
             $self->_parse_bookmarks($user, $passwd);
         }
-        elsif($url =~ /del.icio.us/)
-        {
+        elsif ($url =~ /del.icio.us/) {
             bless $self, 'Bookmarks::Delicious';
             $self->new();
             $self->_parse_bookmarks($user, $passwd);
         }
-    } else {
+    }
+    else {
         croak "Nothing to parse!";
     }
 
     return $self;
 }
 
-sub set_title
-{
+sub set_title {
     my ($self, $title) = @_;
 
     $self->{_title} = $title;
 }
 
-sub add_bookmark
-{
+sub add_bookmark {
     my ($self, $item, $parent) = @_;
 
     $parent = ref($parent) ? $parent->{id} : $parent;
     $parent ||= 'root';
-    $item->{parent} ||= $parent;  
-    $self->{_nextid}++ while(defined $self->{_items}{$self->{_nextid}});
-    $item->{id} ||= $self->{_nextid};
-    $item->{url} ||= '';
+    $item->{parent} ||= $parent;
+    $self->{_nextid}++ while (defined $self->{_items}{$self->{_nextid}});
+    $item->{id}   ||= $self->{_nextid};
+    $item->{url}  ||= '';
     $item->{name} ||= $item->{url};
-    if(!$item->{url} && !$item->{name})
-    {
+    if (!$item->{url} && !$item->{name}) {
         warn 'No URL or NAME for this bookmark !?';
         return undef;
     }
 
 # check time formatting!
 
-    if(!$self->{_items}{$item->{id}})
-    {
+    if (!$self->{_items}{$item->{id}}) {
         push @{$self->{_itemslist}}, $item->{id};
         $self->{_items}{$item->{id}} = $item;
     }
@@ -129,25 +115,22 @@ sub add_bookmark
     return $item;
 }
 
-sub get_from_id
-{
-    my ($self, $id) =@_;
+sub get_from_id {
+    my ($self, $id) = @_;
 
-    return $id if(ref($id));
+    return $id if (ref($id));
 
     return $self->{_items}{$id};
 }
 
-sub get_path_of
-{
+sub get_path_of {
     my ($self, $item) = @_;
 
-    $item = $self->{_items}{$item} if(!ref($item));
+    $item = $self->{_items}{$item} if (!ref($item));
 
     my $path = '';
 
-    while(my $p = $item->{parent})
-    {
+    while (my $p = $item->{parent}) {
         $item = $self->get_from_id($p);
         $path = $item->{name} . "/$path";
     }
@@ -155,8 +138,7 @@ sub get_path_of
     return $path;
 }
 
-sub as_opera
-{
+sub as_opera {
     my ($self) = @_;
 
     my $newobj = dclone($self);
@@ -165,8 +147,7 @@ sub as_opera
     return $newobj;
 }
 
-sub as_netscape
-{
+sub as_netscape {
     my ($self) = @_;
 
     my $newobj = dclone($self);
@@ -175,8 +156,7 @@ sub as_netscape
     return $newobj;
 }
 
-sub as_xml
-{
+sub as_xml {
     my ($self) = @_;
 
     my $newobj = dclone($self);
@@ -186,8 +166,7 @@ sub as_xml
     return $newobj;
 }
 
-sub as_a9
-{
+sub as_a9 {
     my ($self) = @_;
 
     my $newobj = dclone($self);
@@ -199,14 +178,12 @@ sub as_a9
 }
 
 # Output to a file again
-sub write_file
-{
+sub write_file {
     my ($self, $args) = @_;
 
     my $filename = $args->{filename};
 
-    if(!$filename || -e $filename)
-    {
+    if (!$filename || -e $filename) {
         warn "No filename or $filename already exists!";
         return;
     }
@@ -214,14 +191,14 @@ sub write_file
     my $type = $args->{type};
     if (defined $type && $type ne "") {
         my $alias_method = "as_$type";
-        if (! $self->can($alias_method)) {
+        if (!$self->can($alias_method)) {
             croak "No $alias_method method available!";
         }
         $self = $self->$alias_method();
     }
 
-    open my $outfile, ">$filename" or 
-        croak "Can't open $filename for writing ($!)";
+    open my $outfile, ">$filename"
+        or croak "Can't open $filename for writing ($!)";
     binmode($outfile, ':utf8');
     print $outfile $self->as_string();
     close $outfile;
@@ -229,14 +206,12 @@ sub write_file
 }
 
 # Represent content as text (should reproduce original)
-sub as_string
-{
+sub as_string {
     my ($self) = @_;
 
     my $output = '';
     $output .= $self->get_header_as_string();
-    foreach (@{$self->{_items}{root}{children}})
-    {
+    foreach (@{$self->{_items}{root}{children}}) {
         $output .= $self->get_item_as_string($self->{_items}{$_});
     }
     $output .= $self->get_footer_as_string();
@@ -245,16 +220,14 @@ sub as_string
 }
 
 # Get file header if applicable
-sub get_header_as_string
-{
+sub get_header_as_string {
     my ($self) = @_;
 
     return '';
 }
 
 # Get footer if applicable
-sub get_footer_as_string
-{
+sub get_footer_as_string {
     my ($self) = @_;
 
     return '';
@@ -262,42 +235,39 @@ sub get_footer_as_string
 
 # Write contents to a url, eg A9
 # Replace/update param?
-sub write_url
-{
+sub write_url {
     croak "write_url not Implemented";
 }
 
 # Return a list of all root items
-sub get_top_level
-{
+sub get_top_level {
     my ($self) = @_;
 
-    my @root_items = map { $self->{_items}{$_}} @{$self->{_items}{root}{children}};
+    my @root_items = map { $self->{_items}{$_} } @{$self->{_items}{root}{children}};
 
     return @root_items;
 }
 
 # Change/set the list of root items
-sub set_top_level
-{
+sub set_top_level {
     my ($self, @items) = @_;
 
-    if(exists $self->{_items}{root} && defined @{$self->{_items}{root}{children}})
-    {
+    if (exists $self->{_items}{root} && defined @{$self->{_items}{root}{children}}) {
         warn "Root items already exist, use clear to empty or rename to rename an item!";
         return;
     }
 
     $self->{_items}{root}{children} = [];
-    foreach my $root (@items)
-    {
-        my $newitem = { id => $self->{_nextid}++,
-                        name => $root,
-                        type => 'folder',
-                        created => time(),
-                        expanded => undef,
-                        parent => 'root',
-                        children => [] };
+    foreach my $root (@items) {
+        my $newitem = {
+            id       => $self->{_nextid}++,
+            name     => $root,
+            type     => 'folder',
+            created  => time(),
+            expanded => undef,
+            parent   => 'root',
+            children => []
+        };
         unshift(@{$self->{_itemlist}}, $newitem->{id});
         push(@{$self->{_items}{root}{children}}, $newitem->{id});
         $self->{_items}{$newitem->{id}} = $newitem;
@@ -306,12 +276,10 @@ sub set_top_level
 }
 
 # rename an item
-sub rename
-{
+sub rename {
     my ($self, $item, $newname) = @_;
 
-    if(!defined $item->{id} || !$self->{_items}{$item->{id}})
-    {
+    if (!defined $item->{id} || !$self->{_items}{$item->{id}}) {
         warn "You didn't pass in a valid item!";
         return;
     }
@@ -322,23 +290,20 @@ sub rename
 }
 
 # Return a list of items under the given folder
-sub get_folder_contents
-{
+sub get_folder_contents {
     my ($self, $folder) = @_;
 
-    return () if($folder->{type} ne 'folder');
+    return () if ($folder->{type} ne 'folder');
     my @items = map { $self->{_items}{$_} } @{$folder->{children}};
 
     return @items;
 }
 
 # Find bookmarks or folders
-sub find_items
-{
+sub find_items {
     my ($self, $args) = @_;
 
-    if(!$args->{name} && !$args->{url})
-    {
+    if (!$args->{name} && !$args->{url}) {
         warn "No name or url parameter passed";
         return 0;
     }
@@ -346,57 +311,54 @@ sub find_items
     $args->{name} ||= '';
     $args->{url}  ||= '';
 
-    my @matches = grep { 
-                        ( $args->{name} && $_->{name} =~ /$args->{name}/ ) ||
-                        ( $args->{url}  && $_->{url}  =~ /$args->{url}/  ) }
-                         values %{$self->{_items}};
+    my @matches = grep {
+               ($args->{name} && $_->{name} =~ /$args->{name}/)
+            || ($args->{url} && $_->{url} =~ /$args->{url}/)
+    } values %{$self->{_items}};
     return @matches;
 }
 
 # Merge the items in a 2nd bookmarks object into this one
-sub merge
-{
+sub merge {
     my ($self, $import, $ifolder, $tfolder) = @_;
     my @items;
     my @folders;
 
     # Get next level of items from collection
-    if(!$ifolder)
-    {
-        @items = $import->get_top_level();
+    if (!$ifolder) {
+        @items   = $import->get_top_level();
         @folders = $self->get_top_level();
     }
-    else
-    {
+    else {
         @items = $import->get_folder_contents($ifolder);
     }
 
-    foreach my $item (@items)
-    {
+    foreach my $item (@items) {
+
         # At top level, no folders set:
         my $parent = $tfolder || 'root';
-        if($item->{type} eq 'url')
-        {
-            if(!grep {$_->{url} eq $item->{url} && 
-                          $_->{name} eq $item->{name} } @folders)
+        if ($item->{type} eq 'url') {
+            if (!grep { $_->{url} eq $item->{url} && $_->{name} eq $item->{name} }
+                @folders)
             {
+
                 # It's a url, and it's not already there
                 $self->add_bookmark($item, $parent);
             }
         }
-        else
-        {
+        else {
             my ($folder) = grep { $_->{name} eq $item->{name} } @folders;
-            if(!$folder)
-            {
+            if (!$folder) {
+
                 # It's a folder, and its not already there
                 $self->add_bookmark($item, $parent);
             }
+
             # Add sub items to this folder
             $self->merge($import, $item, $folder);
         }
     }
-    
+
 }
 
 1;
