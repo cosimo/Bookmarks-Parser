@@ -1,5 +1,8 @@
 Revision history for Bookmarks::Parser
 
+0.04
+        Fixed RT#18238
+
 0.03
         Fixed RT#18894
 

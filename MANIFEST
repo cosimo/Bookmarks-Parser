@@ -21,5 +21,7 @@ t/mozbookmarks.html
 t/opera-1150-unix.adr
 t/opera-1150.adr
 t/opera6.adr
+t/rt18238.html
+t/rt18238.t
 t/rt18894.t
 t/rt18894.xml

@@ -211,11 +211,21 @@ sub write_file
         return;
     }
 
+    my $type = $args->{type};
+    if (defined $type && $type ne "") {
+        my $alias_method = "as_$type";
+        if (! $self->can($alias_method)) {
+            croak "No $alias_method method available!";
+        }
+        $self = $self->$alias_method();
+    }
+
     open my $outfile, ">$filename" or 
         croak "Can't open $filename for writing ($!)";
     binmode($outfile, ':utf8');
     print $outfile $self->as_string();
     close $outfile;
+
 }
 
 # Represent content as text (should reproduce original)
