@@ -79,7 +79,7 @@ XML
     elsif($item->{type} eq 'url')
     {
         $string .= << "XML";
-    <bookmark id="$id" name="$name" created="$created" visited="$visited" modified="$modified" icon="$icon" description="$desc" order="$order" />
+    <bookmark id="$id" url="$url" name="$name" created="$created" visited="$visited" modified="$modified" icon="$icon" description="$desc" order="$order" />
 XML
 
     }
