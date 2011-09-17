@@ -5,7 +5,7 @@ use Test::More;
 if ($ENV{DELUSER} && $ENV{DELPASS}) {
    plan tests => 6;
 } else {
-    plan skip_all => 'This test requires login. set DELUSER and DELPASSWD to enable this test' ;
+    plan skip_all => 'This test requires login. set DELUSER and DELPASS to enable this test' ;
 }
 
 # 1 test load of base class
