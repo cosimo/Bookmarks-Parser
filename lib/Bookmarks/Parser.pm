@@ -1,15 +1,18 @@
 package Bookmarks::Parser;
 
+use strict;
+use warnings;
+
 use Bookmarks::Netscape;
 use Bookmarks::Opera;
 use Bookmarks::XML;
 use Bookmarks::Delicious;
 use Bookmarks::A9;
-use Storable 'dclone';
-use Carp 'croak';
-use warnings;
 
-our $VERSION = '0.03';
+use Carp 'croak';
+use Storable 'dclone';
+
+our $VERSION = '0.04';
 
 sub new {
     my ($class, %opts) = @_;
@@ -160,7 +163,6 @@ sub as_xml {
     my ($self) = @_;
 
     my $newobj = dclone($self);
-
     bless $newobj, 'Bookmarks::XML';
 
     return $newobj;
@@ -170,7 +172,6 @@ sub as_a9 {
     my ($self) = @_;
 
     my $newobj = dclone($self);
-
     bless $newobj, 'Bookmarks::A9';
 
     return $newobj;
