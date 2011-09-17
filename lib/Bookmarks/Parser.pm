@@ -6,10 +6,10 @@ use Bookmarks::XML;
 use Bookmarks::Delicious;
 use Bookmarks::A9;
 use Storable 'dclone';
-use Carp qw/croak/;
+use Carp 'croak';
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub new
 {

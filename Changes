@@ -1,5 +1,8 @@
 Revision history for Bookmarks::Parser
 
+0.03
+        Fixed RT#18894
+
 0.02
         [Bookmarks::Opera] Fixed two fairly bad bugs:
           * items separated by lines containing leading spaces (instead of empty)
