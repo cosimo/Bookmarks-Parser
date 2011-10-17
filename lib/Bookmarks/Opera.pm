@@ -14,6 +14,7 @@ my @op_bookmark_fields = (
     "DELETABLE",
     "DESCRIPTION",
     "DISPLAY URL",
+    "ICONFILE",
     "ID",
     "MOVE_IS_COPY",
     "NAME",

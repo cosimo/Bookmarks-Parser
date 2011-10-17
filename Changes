@@ -1,5 +1,9 @@
 Revision history for Bookmarks::Parser
 
+0.05
+        Fixed parsing of ICONFILE property in Opera bookmarks.
+        Added unit tests.
+
 0.04
         Fixed RT#18238
 

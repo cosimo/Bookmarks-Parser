@@ -12,7 +12,7 @@ use Bookmarks::A9;
 use Carp 'croak';
 use Storable 'dclone';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 sub new {
     my ($class, %opts) = @_;

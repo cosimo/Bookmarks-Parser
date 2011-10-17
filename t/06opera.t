@@ -91,6 +91,7 @@ for ("t/opera-1150.adr", "t/opera-1150-unix.adr")
     );
 
     my $download = $subitems[0];
+    my $myopera = $subitems[1];
     my $sports = $subitems[-1];
     my $myomail = $subitems[-2];
 
@@ -119,6 +120,46 @@ for ("t/opera-1150.adr", "t/opera-1150-unix.adr")
     is(
         $myomail->{partnerid} => "opera-mail2",
         "Partnerid is also extracted"
+    );
+
+    is(
+        $myomail->{icon} => 'https://mail.opera.com/favicon.ico',
+        "Icon extracted correctly",
+    );
+
+    is(
+        $myomail->{iconfile} => undef,   # 'iconfile' is translated into 'icon'
+        "Iconfile property shouldn't be there. Icon is used instead",
+    );
+
+    is(
+        $myopera->{id} => 15,
+        "My Opera bookmark id is correct ($myopera->{id})",
+    );
+
+    is(
+        $myopera->{name} => 'My Opera Community',
+        "My Opera bookmark name is correct"
+    );
+
+    is(
+        $myopera->{icon} => 'http://redir.opera.com/favicons/myopera/favicon.ico',
+        "My Opera icon extracted correctly",
+    );
+
+    is(
+        $myopera->{on_personalbar} => 'YES',
+        "Personal bar flag is parsed correctly",
+    );
+
+    is(
+        $myopera->{personalbar_pos} => 4,
+        "Personal bar position is parsed correctly",
+    );
+
+    is(
+        $myopera->{partnerid} => 'opera-operasocial',
+        "My Opera partnerid is parsed correctly",
     );
 
 }  # DOS and Unix line endings
