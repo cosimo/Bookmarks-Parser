@@ -13,12 +13,20 @@ isa_ok($parser, 'Bookmarks::Opera');
 # 3 check root items exist
 my @roots = $parser->get_top_level();
 is_deeply([ map { $_->{name} } @roots ],
-            ['Trash', 'Opera', 'Download.com', 'Amazon.com', 'Dealtime.com', 'eBay'], 'Found root items');
+            ['Trash', 'Opera', 'Download.com', 'Amazon.com', 'Dealtime.com', 'eBay', 'Fake eBay' ], 'Found root items');
 
 # 4,5 check we parsed subitems
 my @subitems = $parser->get_folder_contents($roots[1]);
 is($subitems[0]->{url}, 'http://www.opera.com/download/', 'Found first subitem');
 is($subitems[-1]->{url}, 'http://www.opera.com/support/', 'Found last subitem');
+
+# Check that "DISPLAY URL" is understood properly
+my $fake_ebay = $roots[6];
+is($fake_ebay->{id}, 25, 'Got the fake ebay bookmark id');
+is($fake_ebay->{name}, 'Fake eBay', 'Got the fake ebay bookmark name');
+is($fake_ebay->{url}, 'http://fake.ebay.com/', 'URL is parsed correctly');
+is($fake_ebay->{display_url}, 'http://www.ebay.com/', 'DISPLAY URL is parsed correctly');
+
 # 6 create new opera bookmarks
 my $opera = Bookmarks::Opera->new();
 isa_ok($opera, 'Bookmarks::Opera');
