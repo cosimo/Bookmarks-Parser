@@ -1,5 +1,9 @@
 Revision history for Bookmarks::Parser
 
+0.06
+        Fixed parsing of DISPLAY URL property in Opera bookmarks.
+        Added unit tests.
+
 0.05
         Fixed parsing of ICONFILE property in Opera bookmarks.
         Added unit tests.
