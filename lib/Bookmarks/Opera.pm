@@ -30,7 +30,10 @@ my @op_bookmark_fields = (
     "VISITED",
 );
 
-my %op_bookmark_fields = map { $_ => qr/\s+$_=(.*)/ } @op_bookmark_fields;
+my %op_bookmark_fields = map {
+    # No qr{}x, field names contain significant whitespace
+    $_ => qr{^\s+$_=(.*)}
+} @op_bookmark_fields;
 
 sub _parse_file
 {
