@@ -1,5 +1,8 @@
 Revision history for Bookmarks::Parser
 
+0.07    Fixed parsing of IN PANEL and PANEL_POS properties
+        in Opera bookmarks (RT#75463).
+
 0.06
         Fixed parsing of DISPLAY URL property in Opera bookmarks.
         Added unit tests.
