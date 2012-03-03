@@ -1,0 +1,15 @@
+Opera Hotlist version 2.0
+Options: encoding = utf8, version=21
+
+#URL
+        ID=4758
+        NAME=Python
+        URL=http://www.edgewall.org/python-sidebar/html/toc-tutorial.html
+        CREATED=1210982400
+        VISITED=1287935116
+        DESCRIPTION=A nifty Python documentation sidebar for Mozilla
+        ON PERSONALBAR=YES
+        PERSONALBAR_POS=5
+        IN PANEL=YES
+        PANEL_POS=9
+        UNIQUEID=F55F6510D40C11DFA27B96B9D793E9C1
