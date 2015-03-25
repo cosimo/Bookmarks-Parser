@@ -12,7 +12,7 @@ use Bookmarks::A9;
 use Carp 'croak';
 use Storable 'dclone';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my ($class, %opts) = @_;
@@ -253,7 +253,7 @@ sub get_top_level {
 sub set_top_level {
     my ($self, @items) = @_;
 
-    if (exists $self->{_items}{root} && defined @{$self->{_items}{root}{children}}) {
+    if (exists $self->{_items}{root} && $self->{_items}{root}{children}) {
         warn "Root items already exist, use clear to empty or rename to rename an item!";
         return;
     }
