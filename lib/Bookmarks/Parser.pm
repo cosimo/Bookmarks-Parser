@@ -22,7 +22,7 @@ sub new {
     my $self = bless({%opts}, $class);
     $self->{_nextid}   = 1;
     $self->{_title}    = '';
-    $self->{_items}    = {root => {name => 'root', url => ''}};
+    $self->{_items}    = { root => { name => 'root', url => '' } };
     $self->{_itemlist} = [];
     return $self;
 }
@@ -38,7 +38,8 @@ sub parse {
     croak "Parse can't be called as a class method" unless ref $self;
     croak "Arguments must be a hashref"             unless ref $args;
 
-    my ($filename, $url, $user, $passwd) = @$args{'filename', 'url', 'user', 'passwd'};
+    my ($filename, $url, $user, $passwd)
+        = @$args{ 'filename', 'url', 'user', 'passwd' };
 
     if ($filename =~ m/\.zip$/) {
         bless $self, 'Bookmarks::Explorer';
@@ -98,7 +99,7 @@ sub add_bookmark {
     $parent = ref($parent) ? $parent->{id} : $parent;
     $parent ||= 'root';
     $item->{parent} ||= $parent;
-    $self->{_nextid}++ while (defined $self->{_items}{$self->{_nextid}});
+    $self->{_nextid}++ while (defined $self->{_items}{ $self->{_nextid} });
     $item->{id}   ||= $self->{_nextid};
     $item->{url}  ||= '';
     $item->{name} ||= $item->{url};
@@ -107,13 +108,13 @@ sub add_bookmark {
         return undef;
     }
 
-# check time formatting!
+    # check time formatting!
 
-    if (!$self->{_items}{$item->{id}}) {
-        push @{$self->{_itemslist}}, $item->{id};
-        $self->{_items}{$item->{id}} = $item;
+    if (!$self->{_items}{ $item->{id} }) {
+        push @{ $self->{_itemslist} }, $item->{id};
+        $self->{_items}{ $item->{id} } = $item;
     }
-    push @{$self->{_items}{$item->{parent}}{children}}, $item->{id};
+    push @{ $self->{_items}{ $item->{parent} }{children} }, $item->{id};
 
     return $item;
 }
@@ -212,7 +213,7 @@ sub as_string {
 
     my $output = '';
     $output .= $self->get_header_as_string();
-    foreach (@{$self->{_items}{root}{children}}) {
+    foreach (@{ $self->{_items}{root}{children} }) {
         $output .= $self->get_item_as_string($self->{_items}{$_});
     }
     $output .= $self->get_footer_as_string();
@@ -244,7 +245,8 @@ sub write_url {
 sub get_top_level {
     my ($self) = @_;
 
-    my @root_items = map { $self->{_items}{$_} } @{$self->{_items}{root}{children}};
+    my @root_items
+        = map { $self->{_items}{$_} } @{ $self->{_items}{root}{children} };
 
     return @root_items;
 }
@@ -254,7 +256,8 @@ sub set_top_level {
     my ($self, @items) = @_;
 
     if (exists $self->{_items}{root} && $self->{_items}{root}{children}) {
-        warn "Root items already exist, use clear to empty or rename to rename an item!";
+        warn
+            "Root items already exist, use clear to empty or rename to rename an item!";
         return;
     }
 
@@ -269,9 +272,9 @@ sub set_top_level {
             parent   => 'root',
             children => []
         };
-        unshift(@{$self->{_itemlist}}, $newitem->{id});
-        push(@{$self->{_items}{root}{children}}, $newitem->{id});
-        $self->{_items}{$newitem->{id}} = $newitem;
+        unshift(@{ $self->{_itemlist} }, $newitem->{id});
+        push(@{ $self->{_items}{root}{children} }, $newitem->{id});
+        $self->{_items}{ $newitem->{id} } = $newitem;
     }
 
 }
@@ -280,14 +283,14 @@ sub set_top_level {
 sub rename {
     my ($self, $item, $newname) = @_;
 
-    if (!defined $item->{id} || !$self->{_items}{$item->{id}}) {
+    if (!defined $item->{id} || !$self->{_items}{ $item->{id} }) {
         warn "You didn't pass in a valid item!";
         return;
     }
 
-    $self->{_items}{$item->{id}}{name} = $newname;
+    $self->{_items}{ $item->{id} }{name} = $newname;
 
-    return $self->{_items}{$item->{id}}{name};
+    return $self->{_items}{ $item->{id} }{name};
 }
 
 # Return a list of items under the given folder
@@ -295,7 +298,7 @@ sub get_folder_contents {
     my ($self, $folder) = @_;
 
     return () if ($folder->{type} ne 'folder');
-    my @items = map { $self->{_items}{$_} } @{$folder->{children}};
+    my @items = map { $self->{_items}{$_} } @{ $folder->{children} };
 
     return @items;
 }
@@ -315,7 +318,7 @@ sub find_items {
     my @matches = grep {
                ($args->{name} && $_->{name} =~ /$args->{name}/)
             || ($args->{url} && $_->{url} =~ /$args->{url}/)
-    } values %{$self->{_items}};
+    } values %{ $self->{_items} };
     return @matches;
 }
 
@@ -339,8 +342,10 @@ sub merge {
         # At top level, no folders set:
         my $parent = $tfolder || 'root';
         if ($item->{type} eq 'url') {
-            if (!grep { $_->{url} eq $item->{url} && $_->{name} eq $item->{name} }
-                @folders)
+            if (!grep {
+                    $_->{url} eq $item->{url} && $_->{name} eq $item->{name}
+                } @folders
+                )
             {
 
                 # It's a url, and it's not already there
