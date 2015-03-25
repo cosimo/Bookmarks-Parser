@@ -4,3 +4,5 @@ MANIFEST.bak
 blib
 pm_to_blib
 *.tar.gz
+MYMETA.json
+MYMETA.yml
