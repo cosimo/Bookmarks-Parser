@@ -68,10 +68,11 @@ sub _parse_item
     else
     {
        $item_info{type} = 'folder';
-       if(lc $item->parent->right() && $item->parent->right->tag() eq 'dd')
+       my $sibling = $item->parent->right();
+       if(defined $sibling && lc $sibling && $sibling->tag() eq 'dd')
        {
-           $item_info{description} = $item->parent->right->as_text();
-           $item = $item->parent->right();
+           $item_info{description} = $sibling->as_text();
+           $item = $sibling;
        }
     }
 
